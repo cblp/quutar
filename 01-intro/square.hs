@@ -7,7 +7,7 @@ solveSquareEquation a b c =
   let d = b * b - 4 * a * c
   in
     if a == 0 then
-      _
+      [-c / b]
     else if d < 0 then
       []
     else
