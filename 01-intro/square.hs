@@ -1,3 +1,6 @@
+module Square (square, solveSquareEquation) where
+
+square :: Double -> Double
 square x = x * x
 
 -- a x² + b x + c = 0
@@ -7,7 +10,7 @@ solveSquareEquation a b c =
   let d = b * b - 4 * a * c
   in
     if a == 0 then
-      _
+      undefined
     else if d < 0 then
       []
     else
@@ -18,5 +21,6 @@ solveSquareEquation a b c =
       | (±) <- [(-), (+)]
       ]
 
+main :: IO ()
 main =
   print (solveSquareEquation 1 (-2) 1)

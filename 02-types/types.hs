@@ -1,3 +1,5 @@
+module Types where
+
 -- square x = x * x
 
 -- square = \x -> x * x
@@ -88,12 +90,12 @@ data Expr
   = Number Double
   | Var
   | Plus Expr Expr
-  | Mul Expr Expr
-  | Sub Expr Expr
-  | Div Expr Expr
-  | Sin Expr
-  | Cos Expr
-  | Pow Expr Integer
+  -- | Mul Expr Expr
+  -- | Sub Expr Expr
+  -- | Div Expr Expr
+  -- | Sin Expr
+  -- | Cos Expr
+  -- | Pow Expr Integer
   deriving (Eq)
 
 instance Show Expr where
@@ -122,7 +124,7 @@ eval expr x =
     Number n         -> n
     Var              -> x
 
-find :: [a] -> a -> Maybe Int
+-- find :: [a] -> a -> Maybe Int
 
 -- C++
 
