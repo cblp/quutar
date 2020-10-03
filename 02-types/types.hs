@@ -84,15 +84,16 @@ data Point = Point Vector3 Mass
 -- data ExprType = Number | Var
 
 -- sum type
-data Expr = Number Double
-          | Var
-          | Plus Expr Expr
-          | Mul Expr Expr
-          | Sub Expr Expr
-          | Div Expr Expr
-          | Sin Expr
-          | Cos Expr
-          | Pow Expr Integer
+data Expr
+  = Number Double
+  | Var
+  | Plus Expr Expr
+  | Mul Expr Expr
+  | Sub Expr Expr
+  | Div Expr Expr
+  | Sin Expr
+  | Cos Expr
+  | Pow Expr Integer
   deriving (Eq)
 
 instance Show Expr where
