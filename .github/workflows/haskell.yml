@@ -24,15 +24,27 @@ jobs:
         cache-name: cache-stack
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml') }}
+        key:
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml') }}
         # -${{ hashFiles('**/*.cabal') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
+    - name: Install stack
+      run:
+        - mkdir -p ~/.local/bin
+        - export PATH=$HOME/.local/bin:$PATH
+        - |
+          if [ -x ~/.local/bin/stack ]; then
+            stack --version
+          else
+            curl -sSL https://get.haskellstack.org/ | sh
+        - export STACK="stack --no-terminal --install-ghc"
+
     - name: Install dependencies
-      run: stack build --only-dependencies --test --no-run-tests
+      run: stack build --test --only-dependencies
     - name: Build
       run: stack build
     - name: Run tests
