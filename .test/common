@@ -1,0 +1,13 @@
+#!/bin/bash
+set -eux -o pipefail
+
+export ghc_warnings=(
+    -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wredundant-constraints
+    -Wwarn=missing-signatures -Wwarn=type-defaults -Wwarn=unused-top-binds
+    -Wno-unticked-promoted-constructors
+)
+
+export ghc_options=(-fforce-recomp -Werror "${ghc_warnings[@]}")
+
+export stack_options=(--no-terminal --install-ghc)
