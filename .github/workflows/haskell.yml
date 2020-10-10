@@ -12,9 +12,10 @@ env:
       -Wredundant-constraints
     -Wwarn=missing-signatures -Wwarn=type-defaults -Wwarn=unused-top-binds
     -Wno-unticked-promoted-constructors
-  compile: ghc $ghc_warnings -Werror
+  compile: ghc ${{env.ghc_warnings}} -Werror
   stack: stack --no-terminal --install-ghc
-  stack_test: $stack --ghc-options="${ghc_warnings[*]}" --ghc-options=-Werror
+  stack_test:
+    ${{env.stack}} --ghc-options="${{env.ghc_warnings}}" --ghc-options=-Werror
 
 jobs:
   build:
