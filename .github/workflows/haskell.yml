@@ -32,9 +32,9 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - {name: Compile task 01, run: .test/haskell ghc 01-intro/*.hs}
-    - {name: Compile task 02, run: .test/haskell ghc 02-types/*.hs}
-    - {name: Run tests in task 03, run: .test/haskell stack-test 03-testing}
+    - {name: Compile task 01, run: .test/ghc 01-intro/*.hs}
+    - {name: Compile task 02, run: .test/ghc 02-types/*.hs}
+    - {name: Run tests in task 03, run: .test/stack-test 03-testing}
 
     # - name: Install stack
     #   run:
