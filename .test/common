@@ -10,4 +10,4 @@ export ghc_warnings=(
 
 export ghc_options=(-fforce-recomp -Werror "${ghc_warnings[@]}")
 
-export stack_options=(--no-terminal --no-install-ghc)
+export stack_options=(--no-terminal --system-ghc)
