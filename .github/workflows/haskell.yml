@@ -25,8 +25,7 @@ jobs:
       with:
         path: ~/.stack
         key:
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml') }}
-        # -${{ hashFiles('**/*.cabal') }}
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml') }}-${{ hashFiles('**/*.cabal') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
