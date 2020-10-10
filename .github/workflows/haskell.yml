@@ -7,15 +7,11 @@ on:
     branches: [ master ]
 
 env:
-  ghc_warnings:
-    -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns
-      -Wredundant-constraints
-    -Wwarn=missing-signatures -Wwarn=type-defaults -Wwarn=unused-top-binds
-    -Wno-unticked-promoted-constructors
-  compile: ghc ${{env.ghc_warnings}} -Werror
-  stack: stack --no-terminal --install-ghc
-  stack_test:
-    ${{env.stack}} --ghc-options="${{env.ghc_warnings}}" --ghc-options=-Werror
+  stack:
+    stack
+      --no-terminal
+      --install-ghc
+      --ghc-options="-Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -Wwarn=missing-signatures -Wwarn=type-defaults -Wwarn=unused-top-binds -Wno-unticked-promoted-constructors -Werror"
 
 jobs:
   build:
@@ -43,6 +39,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
+    - {name: Compile task 01, run: $stack ghc 01-intro/*.hs}
+    - {name: Compile task 02, run: $stack ghc 02-types/*.hs}
+    - {name: Run tests in task 03, run: $stack test 03-testing}
+
     # - name: Install stack
     #   run:
     #     - mkdir -p ~/.local/bin
@@ -60,7 +60,3 @@ jobs:
     #   run: stack build
     # - name: Run tests
     #   run: stack test
-
-    - {name: Compile task 01, run: $compile 01-intro/*.hs}
-    - {name: Compile task 02, run: $compile 02-types/*.hs}
-    - {name: Run tests in task 03, run: $stack_test 03-testing}
