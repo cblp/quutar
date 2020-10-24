@@ -2,3 +2,4 @@ resolver: lts-16.17
 
 packages:
   - 03-testing
+  - 04-testing

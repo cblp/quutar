@@ -5,6 +5,7 @@ export ghc_warnings=(
     -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wredundant-constraints
     -Wwarn=missing-signatures -Wwarn=type-defaults -Wwarn=unused-top-binds
+        -Wwarn=orphans
     -Wno-unticked-promoted-constructors
 )
 
