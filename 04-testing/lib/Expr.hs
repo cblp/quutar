@@ -1,7 +1,5 @@
 module Expr where
 
-import           GHC.Generics (Generic)
-
 {-
   sin x + 2 x ^ 4
 
@@ -19,7 +17,7 @@ data Expr
   | Sin Expr
   | Cos Expr
   | Pow Expr Integer
-  deriving (Eq, Generic)
+  deriving (Eq)
 
 instance Show Expr where
   show expr =
