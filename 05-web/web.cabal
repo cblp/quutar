@@ -6,6 +6,7 @@ version: 2020
 build-type: Simple
 
 executable server
-  build-depends: base, optparse-generic, scotty
+  build-depends: base, optparse-generic, text, scotty, shakespeare
   hs-source-dirs: server
   main-is: Main.hs
+  other-modules: Expr
