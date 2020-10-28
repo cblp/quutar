@@ -30,27 +30,30 @@ server port =
 
 form :: ActionM ()
 form = do
-  exprText <- param "expr"
+  exprText <- param "expr" <|> pure ""
   mx       <- (Just <$> param "x") <|> pure Nothing
-  let eExpr = readEither $ Text.unpack exprText
-  let evalResult =
-        case (eExpr, mx) of
-          (Left err, _)     -> err
-          (_, Nothing)      -> ""
-          (Right e, Just x) -> show $ eval e x
+  let
+    eExpr =
+      case exprText of
+        "" -> Left ""
+        _  -> readEither $ Text.unpack exprText
+    evalResult =
+      case (eExpr, mx) of
+        (Right e, Just x) -> show $ eval e x
+        _ -> ""
   html
     [stext|
       <form>
         <table>
           <tr>
-            <td>expr
+            <td>expr:
             <td><input name=expr value="#{exprText}">
             <td>#{either id show eExpr}
           <tr>
-            <td>x
+            <td>x:
             <td><input name=x value="#{maybe "" show mx}">
           <tr>
-            <td>eval
+            <td>eval:
             <td>#{evalResult}
         </table>
         <input type=submit>
