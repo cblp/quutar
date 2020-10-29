@@ -1,6 +1,5 @@
 {-# OPTIONS -Wno-orphans #-}
 
-import           Control.Monad         (guard)
 import           Test.Tasty            (defaultMain)
 import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, conjoin,
                                         counterexample, getSize, oneof, resize,
@@ -40,9 +39,11 @@ instance Arbitrary Expr where
           , Cos <$> arbitrary
           , Pow <$> arbitrary <*> arbitrary
           ]
-      ++  (guard (size >= 1) *>
+      ++  if size >= 1 then
             [ Mul <$> halve arbitrary <*> halve arbitrary
             , Div <$> halve arbitrary <*> halve arbitrary
             , Add <$> arbitrary <*> arbitrary
             , Sub <$> arbitrary <*> arbitrary
-            ])
+            ]
+          else
+            []
