@@ -1,3 +1,5 @@
+{-# OPTIONS -Wno-orphans #-}
+
 import           Control.Monad         (guard)
 import           Test.Tasty            (defaultMain)
 import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, conjoin,
@@ -20,7 +22,7 @@ main =
                     err < accuracy
                 | x <- roots
                 , let err =
-                        (a * x * x + b * x + c)
+                        abs (a * x * x + b * x + c)
                         / maximum (map abs [a, b, c])
                 ]
 
