@@ -40,7 +40,7 @@ form = do
     evalResult =
       case (eExpr, mx) of
         (Right e, Just x) -> show $ eval e x
-        _ -> ""
+        _                 -> ""
   html
     [stext|
       <form>
