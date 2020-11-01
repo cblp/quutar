@@ -32,7 +32,10 @@ main = do
   Options{port, verbose} <- getRecord "A simple web server"
   when verbose $
     putStrLn $ "Starting server at http://localhost:" ++ show port
-  scotty port serverDescription
+  server port
+
+server :: Int -> IO ()
+server port = scotty port serverDescription
 
 serverDescription :: ScottyM ()
 serverDescription =
