@@ -37,13 +37,13 @@ instance Arbitrary Expr where
           , Number <$> arbitrary
           , Sin <$> arbitrary
           , Cos <$> arbitrary
-          , Pow <$> arbitrary <*> arbitrary
+          , Pow <$> halve arbitrary <*> halve arbitrary
           ]
       ++  if size >= 1 then
             [ Mul <$> halve arbitrary <*> halve arbitrary
             , Div <$> halve arbitrary <*> halve arbitrary
-            , Add <$> arbitrary <*> arbitrary
-            , Sub <$> arbitrary <*> arbitrary
+            , Add <$> halve arbitrary <*> halve arbitrary
+            , Sub <$> halve arbitrary <*> halve arbitrary
             ]
           else
             []
