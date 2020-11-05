@@ -1,4 +1,8 @@
+{-# LANGUAGE DeriveGeneric  #-}
+
 module Expr where
+
+import           GHC.Generics      (Generic)
 
 {-
   sin x + 2 x ^ 4
@@ -17,7 +21,21 @@ data Expr
   | Sin Expr
   | Cos Expr
   | Pow Expr Integer
-  deriving (Eq)
+  deriving (Generic, Read)
+
+instance Eq Expr where
+  Number x  == Number y
+    | isNaN x, isNaN y   = True
+    | otherwise          = x == y
+  Var       == Var       = True
+  Add x1 x2 == Add y1 y2 = x1 == y1 && x2 == y2
+  Sub x1 x2 == Sub y1 y2 = x1 == y1 && x2 == y2
+  Mul x1 x2 == Mul y1 y2 = x1 == y1 && x2 == y2
+  Div x1 x2 == Div y1 y2 = x1 == y1 && x2 == y2
+  Pow x1 x2 == Pow y1 y2 = x1 == y1 && x2 == y2
+  Sin x     == Sin y     = x == y
+  Cos x     == Cos y     = x == y
+  _         == _         = False
 
 instance Show Expr where
   show expr =
