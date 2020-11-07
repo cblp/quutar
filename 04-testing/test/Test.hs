@@ -34,7 +34,7 @@ instance Arbitrary Expr where
     let halve = resize (size `div` 2)
     oneof
       $   [ pure Var
-          , Number <$> arbitrary
+          , Number <$> oneof [arbitrary, fromInteger <$> arbitrary]
           , Sin <$> arbitrary
           , Cos <$> arbitrary
           , Pow <$> halve arbitrary <*> halve arbitrary
