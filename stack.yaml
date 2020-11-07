@@ -4,6 +4,7 @@ packages:
   - 03-testing
   - 04-testing
   - 05-web
+  - 06-parsing
 
 # extra-deps:
 #   - regex-posix-clib-2.7

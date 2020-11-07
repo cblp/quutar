@@ -2,7 +2,7 @@
 
 import           Test.Tasty            (defaultMain)
 import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, conjoin,
-                                        counterexample, getSize, oneof, resize,
+                                        counterexample, getSize, oneof, scale,
                                         testProperty, (==>))
 
 import           Expr                  (Expr (..))
@@ -31,13 +31,18 @@ accuracy = 1e-12
 instance Arbitrary Expr where
   arbitrary = do
     size <- getSize
-    let halve = resize (size `div` 2)
+    let halve = scale (`div` 2)
     oneof
       $   [ pure Var
+          -- , Number <$> arbitrary
           , Number <$> oneof [arbitrary, fromInteger <$> arbitrary]
           , Sin <$> arbitrary
           , Cos <$> arbitrary
           , Pow <$> halve arbitrary <*> halve arbitrary
+          -- , do
+          --     a <- halve arbitrary
+          --     n <- halve arbitrary
+          --     pure $ Pow a n
           ]
       ++  if size >= 1 then
             [ Mul <$> halve arbitrary <*> halve arbitrary

@@ -1,0 +1,31 @@
+cabal-version: 2.2
+
+name: parsing
+version: 2020
+
+build-type: Simple
+
+common language
+  build-depends: base
+  default-language: Haskell2010
+
+library
+  import: language
+  build-depends:
+    -- global
+    megaparsec,
+    -- project
+    property-testing
+  exposed-modules: Expr.Parse
+  hs-source-dirs: lib
+
+test-suite test
+  import: language
+  build-depends:
+    -- global
+    megaparsec, tasty, tasty-hunit,
+    -- project
+    property-testing, parsing
+  hs-source-dirs: test
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
