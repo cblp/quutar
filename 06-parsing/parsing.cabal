@@ -13,7 +13,7 @@ library
   import: language
   build-depends:
     -- global
-    megaparsec,
+    megaparsec, parser-combinators,
     -- project
     property-testing
   exposed-modules: Expr.Parse
@@ -23,7 +23,7 @@ test-suite test
   import: language
   build-depends:
     -- global
-    megaparsec, tasty, tasty-hunit,
+    megaparsec, tasty, tasty-hunit, tasty-quickcheck,
     -- project
     property-testing, parsing
   hs-source-dirs: test
