@@ -151,3 +151,15 @@ getUser port = do
   port <- getPort config
   getUser port
   ) :: IO User
+
+-- вытащить результат из действия в общем случае можно, только связав со следующим действием
+
+-- из
+getLine :: IO String
+-- можно вытащить String только внутри другого IO, например, main
+
+main = getLine >>= print
+-- или то же самое
+main = do
+  line <- getLine
+  print line
