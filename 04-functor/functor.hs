@@ -143,3 +143,11 @@ getUser port = do
   pure User{login = "someuser", uid = 109}
 
 -- $> getConfig >>= getPort >>= getUser
+
+(getConfig >>= getPort >>= getUser) :: IO User
+==
+(do
+  config <- getConfig
+  port <- getPort config
+  getUser port
+  ) :: IO User
