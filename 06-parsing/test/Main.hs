@@ -1,8 +1,10 @@
+{-# OPTIONS -Wno-orphans #-}
+
 import           Test.Tasty            (TestName, TestTree, defaultMain,
                                         testGroup)
 import           Test.Tasty.HUnit      (assertFailure, testCase, (@?=))
 import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, getSize, oneof,
-                                        -- counterexample, testProperty, (===)
+                                        -- counterexample, testProperty, (===),
                                         scale)
 import           Text.Megaparsec       (errorBundlePretty, parse)
 
