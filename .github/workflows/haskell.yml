@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  TASTY_TIMEOUT: 10s
+
 jobs:
   build:
 
