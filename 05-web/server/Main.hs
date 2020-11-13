@@ -35,10 +35,10 @@ main = do
   server port
 
 server :: Int -> IO ()
-server port = scotty port serverDescription
+server port = scotty port requestMapping
 
-serverDescription :: ScottyM ()
-serverDescription =
+requestMapping :: ScottyM ()
+requestMapping =
   get "/" form
 
 form :: ActionM ()
