@@ -173,9 +173,7 @@ sendMessage token chat_id text =
 telegramRpc :: FromJSON result => Token -> String -> [FormParam] -> IO result
 telegramRpc token method params = do
   rawResponse <-
-    post
-      ("https://api.telegram.org/bot" <> token <> "/" <> method)
-      params
+    post ("https://api.telegram.org/bot" <> token <> "/" <> method) params
   jsonResponse <- asJSON rawResponse
   let Ok{ok, result} = jsonResponse ^. responseBody
   guard ok
