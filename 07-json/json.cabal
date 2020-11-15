@@ -34,7 +34,7 @@ test-suite test
   import: language
   build-depends:
     -- global
-    containers, tasty, tasty-hunit, temporary,
+    containers, hedgehog, tasty, tasty-hedgehog, temporary,
     -- package
     auction,
   hs-source-dirs: test

@@ -1,42 +1,50 @@
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Prelude          hiding (id)
+import           Prelude             hiding (id)
 
-import           Data.Foldable    (toList)
-import           Data.IORef       (IORef, modifyIORef, newIORef, readIORef)
-import           Data.Sequence    (Seq, (|>))
-import           Data.Text        (Text)
-import           System.IO.Temp   (withSystemTempFile)
-import           Test.Tasty       (defaultMain, testGroup)
-import           Test.Tasty.HUnit (testCase, (@?=))
+import           Data.Foldable       (toList)
+import           Data.IORef          (IORef, modifyIORef, newIORef, readIORef)
+import           Data.Sequence       (Seq, (|>))
+import           Data.Text           (Text)
+import           Hedgehog            (Property, evalIO, property, withTests,
+                                      (===))
+import           System.IO.Temp      (withSystemTempFile)
+import           Test.Tasty          (defaultMain, testGroup)
+import           Test.Tasty.Hedgehog (testProperty)
 
-import           Auction          (auction)
-import           Telegram         (Chat (..), Message (..), Telegram (..),
-                                   Update (..), User (..))
+import           Auction             (auction)
+import           Telegram            (Chat (..), Message (..), Telegram (..),
+                                      Update (..), User (..))
 
 main :: IO ()
 main =
   defaultMain $
-  testGroup "" [testCase "auction takes stakes" auctionTakesStakes]
+  testGroup "" [testProperty "auction takes stakes" propAuctionTakesStakes]
 
-auctionTakesStakes :: IO ()
-auctionTakesStakes =
-  do
-    (telegram, sentRef) <-
-      newTelegram
-        [ makeUpdate 30 "Floyd" "100"
-        , makeUpdate 31 "Lloyd" "200"
-        , makeUpdate 32 "Floyd" "300"
-        ]
-    withSystemTempFile "stakes-sqlite" $ \databaseFile _ ->
-      auction telegram databaseFile Nothing
-    sent <- readIORef sentRef
+propAuctionTakesStakes :: Property
+propAuctionTakesStakes =
+  withTests 1 $
+  property $ do
+    sent <-
+      evalIO $
+        runTelegram
+          [ makeUpdate 30 "Floyd" "100"
+          , makeUpdate 31 "Lloyd" "200"
+          , makeUpdate 32 "Floyd" "300"
+          ]
     toList sent
-      @?= [ (36, "Floyd: 100\n")
+      === [ (36, "Floyd: 100\n")
           , (36, "Floyd: 100\nLloyd: 200\n")
           , (36, "Floyd: 300\nLloyd: 200\n")
           ]
+
+runTelegram :: [Update] -> IO (Seq (Integer, Text))
+runTelegram updates = do
+  (telegram, sentRef) <- newTelegram updates
+  withSystemTempFile "stakes-sqlite" $ \databaseFile _ ->
+    auction telegram databaseFile Nothing
+  readIORef sentRef
 
 newTelegram :: [Update] -> IO (Telegram, IORef (Seq (Integer, Text)))
 newTelegram updates =
