@@ -13,7 +13,6 @@ module Database (EntityField (StakeValue), Stake (..), StakeId, runDb) where
 
 import           Control.Monad.Logger       (NoLoggingT)
 import           Control.Monad.Trans.Reader (ReaderT)
-import           Data.Int                   (Int64)
 import           Data.Text                  (Text)
 import           Database.Persist.Sqlite    (EntityField, SqlBackend,
                                              runMigration, runSqlite)
@@ -27,7 +26,7 @@ $(share
   [persistLowerCase|
     Stake
       username  Text
-      value     Int64
+      value     Int
       UniqueUsername username
       deriving Show
   |])
