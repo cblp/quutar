@@ -1,3 +1,5 @@
+{-# OPTIONS -Wno-missing-signatures #-}
+
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
@@ -22,7 +24,6 @@ import           Telegram            (Chat (..), Message (..), Telegram (..),
 main :: IO ()
 main = $(defaultMainGenerator)
 
-prop_auction_takes_stakes :: Property
 prop_auction_takes_stakes =
   telegramProp
     [ makeUpdate "Floyd" "100"
