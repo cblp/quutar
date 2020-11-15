@@ -24,20 +24,22 @@ main = $(defaultMainGenerator)
 
 prop_auction_takes_stakes :: Property
 prop_auction_takes_stakes =
+  telegramProp
+    [ makeUpdate "Floyd" "100"
+    , makeUpdate "Lloyd" "200"
+    , makeUpdate "Floyd" "300"
+    ]
+    [ "Floyd: 100\n"
+    , "Floyd: 100\nLloyd: 200\n"
+    , "Floyd: 300\nLloyd: 200\n"
+    ]
+
+telegramProp :: [Update] -> [Text] -> Property
+telegramProp updates messages =
   withTests 1 $
   property $ do
-    sent <-
-      evalIO $
-        runTelegram
-          [ makeUpdate "Floyd" "100"
-          , makeUpdate "Lloyd" "200"
-          , makeUpdate "Floyd" "300"
-          ]
-    toList sent
-      === [ "Floyd: 100\n"
-          , "Floyd: 100\nLloyd: 200\n"
-          , "Floyd: 300\nLloyd: 200\n"
-          ]
+    sent <- evalIO $ runTelegram updates
+    toList sent === messages
 
 runTelegram :: [Update] -> IO (Seq Text)
 runTelegram updates = do
