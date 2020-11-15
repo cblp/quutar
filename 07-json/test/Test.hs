@@ -10,11 +10,12 @@ import           Data.Sequence       (Seq, (|>))
 import           Data.Text           (Text)
 import           Hedgehog            (Property, evalIO, property, withTests,
                                       (===))
-import           System.IO.Temp      (withSystemTempFile)
+import           System.FilePath     ((</>))
+import           System.IO.Temp      (withSystemTempDirectory)
 import           Test.Tasty.Hedgehog (testProperty)
 import           Test.Tasty.TH       (defaultMainGenerator)
 
-import           Auction             (auction)
+import           Auction             (Bot (..), auction)
 import           Telegram            (Chat (..), Message (..), Telegram (..),
                                       Update (..), User (..))
 
@@ -28,9 +29,9 @@ prop_auction_takes_stakes =
     sent <-
       evalIO $
         runTelegram
-          [ makeUpdate 30 "Floyd" "100"
-          , makeUpdate 31 "Lloyd" "200"
-          , makeUpdate 32 "Floyd" "300"
+          [ makeUpdate "Floyd" "100"
+          , makeUpdate "Lloyd" "200"
+          , makeUpdate "Floyd" "300"
           ]
     toList sent
       === [ "Floyd: 100\n"
@@ -41,8 +42,13 @@ prop_auction_takes_stakes =
 runTelegram :: [Update] -> IO (Seq Text)
 runTelegram updates = do
   (telegram, sentRef) <- newTelegram updates
-  withSystemTempFile "stakes-sqlite" $ \databaseFile _ ->
-    auction telegram databaseFile Nothing
+  withSystemTempDirectory "stakes" $ \tmpdir ->
+    auction
+      telegram
+      Bot
+        { databaseFile = tmpdir </> "database.sqlite"
+        , updateIdFile = tmpdir </> "update_id.txt"
+        }
   readIORef sentRef
 
 newTelegram :: [Update] -> IO (Telegram, IORef (Seq Text))
@@ -55,8 +61,8 @@ newTelegram updates =
     getUpdates _ = pure updates
     putLog _ = pure ()
 
-makeUpdate :: Integer -> Text -> Text -> Update
-makeUpdate update_id first_name text = Update{update_id, message}
+makeUpdate :: Text -> Text -> Update
+makeUpdate first_name text = Update{update_id = 59, message}
   where
     chat = Chat{id = 36}
     from = User{first_name, username = Nothing}

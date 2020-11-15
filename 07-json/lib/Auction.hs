@@ -1,38 +1,55 @@
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Auction (auction) where
+module Auction (Bot (..), auction) where
 
-import           Prelude          hiding (id)
+import           Prelude           hiding (id)
 
-import           Control.Monad    (void)
-import           Data.Foldable    (for_)
-import           Data.Maybe       (fromMaybe)
-import           Data.Text        (Text)
-import qualified Data.Text        as Text
-import           Database         (EntityField (StakeValue), Stake (..), runDb)
-import           Database.Persist (entityVal, selectList, upsert, (=.))
-import           Telegram         (Chat (..), Message (..), Telegram (..),
-                                   Update (..), User (..))
+import           Control.Exception (catchJust)
+import           Control.Monad     (guard, void)
+import           Data.Foldable     (for_)
+import           Data.Maybe        (fromMaybe)
+import           Data.Text         (Text)
+import qualified Data.Text         as Text
+import           Database          (EntityField (StakeValue), Stake (..), runDb)
+import           Database.Persist  (entityVal, selectList, upsert, (=.))
+import           System.IO.Error   (isDoesNotExistError)
+import           Telegram          (Chat (..), Message (..), Telegram (..),
+                                    Update (..), User (..))
+import           Text.Read         (readMaybe)
 
-auction :: Telegram -> FilePath -> Maybe Integer -> IO ()
-auction telegram@Telegram{getUpdates, putLog} databaseFile updateIdM =
-  do
-    putLog "Waiting for updates..."
-    updates <- getUpdates updateIdM
-    putLog $ "Got " <> show (length updates) <> " updates"
+data Bot = Bot
+  { databaseFile :: FilePath
+  , updateIdFile :: FilePath
+  }
 
-    for_ updates $ handleUpdate telegram databaseFile
+auction :: Telegram -> Bot -> IO ()
+auction telegram@Telegram{getUpdates, putLog} bot@Bot{updateIdFile} = do
+  updateIdM <- loadUpdateId updateIdFile
+  putLog "Waiting for updates..."
+  updates <- getUpdates updateIdM
+  putLog $ "Got " <> show (length updates) <> " updates"
+  for_ updates $ handleUpdate telegram bot
 
-handleUpdate :: Telegram -> FilePath -> Update -> IO ()
-handleUpdate Telegram{sendMessage, putLog} databaseFile Update{update_id, message} =
+loadUpdateId :: FilePath -> IO (Maybe Integer)
+loadUpdateId updateIdFile =
+  catchJust
+    (guard . isDoesNotExistError)
+    (readMaybe <$> readFile updateIdFile)
+    (\_ -> pure Nothing)
+
+handleUpdate :: Telegram -> Bot -> Update -> IO ()
+handleUpdate telegram bot Update{update_id, message} =
   do
     case text of
       Just text' -> handleNewStake text'
       Nothing    -> putLog $ "No stake for " ++ show message
-    writeFile "update_id" $ show update_id
+    writeFile updateIdFile $ show update_id
     putLog $ "Written update_id = " ++ show update_id
   where
+
+    Telegram{sendMessage, putLog} = telegram
+    Bot{databaseFile, updateIdFile} = bot
 
     Message{chat, text, from} = message
     Chat{id = chatId} = chat
