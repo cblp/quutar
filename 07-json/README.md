@@ -18,7 +18,7 @@
 
 ## Материал для самостоятельного изучения
 
-[`makeExprParser`](https://hackage.haskell.org/package/parser-combinators/docs/Control-Monad-Combinators-Expr.html#v:makeExprParser) — инструмент для построения выражений из комбинаций операторов. Работает только внутри скобок. Что делать со скобками, решаете вы. Подсказка есть в коде.
+[`readMaybe`](https://hackage.haskell.org/package/base/docs/Text-Read.html#v:readMaybe) — прочитать число из строки с результатом в `Maybe`. Для сравнения: `read` в случае ошибки бросает исключение.
 
 ## Как проверять
 
