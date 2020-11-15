@@ -22,7 +22,7 @@
 
 Бота запускать необязательно, но если хочется, то
 
-    stack run bot
+    while stack run bot; do echo; done
 
 Токен для [@quutar_bot](https://t.me/quutar_bot) можно спросить у [преподавателя](https://t.me/cblp_su). Токен коммитить нельзя.
 
