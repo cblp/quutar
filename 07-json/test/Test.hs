@@ -22,7 +22,9 @@ import           Telegram            (Chat (..), Message (..), Telegram (..),
                                       Update (..), User (..))
 
 main :: IO ()
-main = $(defaultMainGenerator)
+main =
+  -- собирает все функции с именем, начинающимся на "prop_"
+  $(defaultMainGenerator)
 
 prop_auction_takes_stakes =
   telegramProp
