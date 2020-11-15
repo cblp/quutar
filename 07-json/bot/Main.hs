@@ -9,6 +9,7 @@ import           Control.Exception  (catchJust)
 import           Control.Monad      (guard, void)
 import           Data.Foldable      (for_)
 import           Data.Maybe         (fromMaybe)
+import           Data.Text          (Text)
 import qualified Data.Text          as Text
 import           Data.Time          (getCurrentTime)
 import           Database.Persist   (entityVal, selectList, upsert, (=.))
@@ -17,7 +18,8 @@ import           System.IO          (hPutStr, stderr)
 import           System.IO.Error    (isDoesNotExistError)
 import           Text.Read          (readMaybe)
 
-import           Database           (EntityField (StakeText), Stake (..), runDb)
+import           Database           (EntityField (StakeValue), Stake (..),
+                                     runDb)
 import           Telegram           (Chat (..), Message (..), Token,
                                      Update (..), User (..), getUpdates,
                                      sendMessage)
@@ -55,15 +57,16 @@ handleUpdate token Update{update_id, message} =
     handleNewStake text' = do
       stakes <-
         runDb "database.sqlite" $ do
+          let value = read $ Text.unpack text'
           void $
             upsert  -- update or insert
-              (Stake username' text')  -- insert
-              [StakeText =. text']  -- update
+              (Stake username' value)  -- insert
+              [StakeValue =. value]  -- update
           map entityVal <$> selectList [] []
       void $ sendMessage token chatId $
         Text.unlines
-          [ stakeUsername <> ": " <> stakeText
-          | Stake{stakeUsername, stakeText} <- stakes
+          [ stakeUsername <> ": " <> tshow stakeValue
+          | Stake{stakeUsername, stakeValue} <- stakes
           ]
       putLog $ "Sent results to " ++ show chat ++ " " ++ show from
 
@@ -78,3 +81,6 @@ putLog :: String -> IO ()
 putLog message = do
   time <- getCurrentTime
   hPutStr stderr $ show time ++ ' ' : message ++ "\n"
+
+tshow :: Show a => a -> Text
+tshow = Text.pack . show

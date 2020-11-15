@@ -9,10 +9,11 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
 
-module Database (EntityField (StakeText), Stake (..), StakeId, runDb) where
+module Database (EntityField (StakeValue), Stake (..), StakeId, runDb) where
 
 import           Control.Monad.Logger       (NoLoggingT)
 import           Control.Monad.Trans.Reader (ReaderT)
+import           Data.Int                   (Int64)
 import           Data.Text                  (Text)
 import           Database.Persist.Sqlite    (EntityField, SqlBackend,
                                              runMigration, runSqlite)
@@ -26,7 +27,7 @@ $(share
   [persistLowerCase|
     Stake
       username  Text
-      text      Text
+      value     Int64
       UniqueUsername username
       deriving Show
   |])
