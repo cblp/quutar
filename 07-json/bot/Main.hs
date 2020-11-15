@@ -1,51 +1,31 @@
-{-# LANGUAGE DeriveAnyClass             #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE DerivingStrategies         #-}
-{-# LANGUAGE GADTs                      #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE NamedFieldPuns             #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE UndecidableInstances       #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE NamedFieldPuns    #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           Prelude                 hiding (id)
+import           Prelude            hiding (id)
 
-import           Control.Exception       (catchJust)
-import           Control.Lens            ((^.))
-import           Control.Monad           (guard, void)
-import           Data.Aeson              as Json
-import           Data.Foldable           (for_, toList)
-import           Data.Maybe              (fromMaybe)
-import           Data.Text               (Text)
-import qualified Data.Text               as Text
-import           Data.Time               (getCurrentTime)
-import           Database.Persist        (Entity (..), selectList, upsert, (=.))
-import           Database.Persist.Sqlite (runMigration, runSqlite)
-import           Database.Persist.TH     (mkMigrate, mkPersist,
-                                          persistLowerCase, share, sqlSettings)
-import           GHC.Generics            (Generic)
-import           Network.Wreq            (FormParam ((:=)), asJSON, post,
-                                          responseBody)
-import           System.Environment      (getEnv)
-import           System.IO               (hPutStr, stderr)
-import           System.IO.Error         (isDoesNotExistError)
-import           Text.Read               (readMaybe)
+import           Control.Exception  (catchJust)
+import           Control.Lens       ((^.))
+import           Control.Monad      (guard, void)
+import           Data.Aeson         as Json
+import           Data.Foldable      (for_, toList)
+import           Data.Maybe         (fromMaybe)
+import           Data.Text          (Text)
+import qualified Data.Text          as Text
+import           Data.Time          (getCurrentTime)
+import           Database.Persist   (Entity (..), selectList, upsert, (=.))
+import           GHC.Generics       (Generic)
+import           Network.Wreq       (FormParam ((:=)), asJSON, post,
+                                     responseBody)
+import           System.Environment (getEnv)
+import           System.IO          (hPutStr, stderr)
+import           System.IO.Error    (isDoesNotExistError)
+import           Text.Read          (readMaybe)
 
-$(share
-  [mkPersist sqlSettings, mkMigrate "migrateAll"]
-  [persistLowerCase|
-    Stake
-      username  Text
-      text      Text
-      UniqueUsername username
-      deriving Show
-  |])
+import           Database           (EntityField (StakeText), Stake (..), runDb)
 
 main :: IO ()
 main = do
@@ -79,8 +59,7 @@ handleUpdate token Update{update_id, message} =
 
     handleNewStake text' = do
       stakes <-
-        runSqlite "database.sqlite" $ do
-          runMigration migrateAll
+        runDb "database.sqlite" $ do
           void $
             upsert  -- update or insert
               (Stake username' text')  -- insert

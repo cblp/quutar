@@ -5,17 +5,29 @@ version: 2020
 
 build-type: Simple
 
-executable bot
-  build-depends:
-    aeson,
-    base,
-    lens,
-    persistent,
-    persistent-sqlite,
-    persistent-template,
-    text,
-    time,
-    wreq,
+common language
+  build-depends: base
   default-language: Haskell2010
+
+library telegram
+  import: language
+  exposed-modules: Telegram
+  hs-source-dirs: telegram
+
+library database
+  import: language
+  build-depends:
+    monad-logger, persistent-sqlite, persistent-template, resourcet,
+    text, transformers
+  exposed-modules: Database
+  hs-source-dirs: database
+
+executable bot
+  import: language
+  build-depends:
+    -- global
+    aeson, lens, persistent, text, time, wreq,
+    -- package
+    database,
   hs-source-dirs: bot
   main-is: Main.hs
