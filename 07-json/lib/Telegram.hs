@@ -5,7 +5,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Telegram
-  ( Chat (..), Message (..), Telegram (..), Token, Update (..), User (..)
+  ( Chat (..)
+  , Message (..)
+  , Telegram (..)
+  , Token
+  , Update (..)
+  , User (..)
   , production
   ) where
 

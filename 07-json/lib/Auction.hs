@@ -42,7 +42,7 @@ handleUpdate :: Telegram -> Bot -> Update -> IO ()
 handleUpdate telegram bot Update{update_id, message} =
   do
     case text of
-      Just text' -> handleNewStake text'
+      Just text' -> handleStake text'
       Nothing    -> putLog $ "No stake for " ++ show message
     writeFile updateIdFile $ show update_id
     putLog $ "Written update_id = " ++ show update_id
@@ -60,14 +60,16 @@ handleUpdate telegram bot Update{update_id, message} =
       --   Just username' -> username'
       --   Nothing        -> first_name
 
-    handleNewStake text' = do
+    handleStake text' = do
       stakes <-
         runDb (Text.pack databaseFile) $ do
-          let value = read $ Text.unpack text'
-          void $
-            upsert  -- update or insert
-              (Stake username' value)  -- insert
-              [StakeValue =. value]  -- update
+          case readMaybe $ Text.unpack text' of
+            Nothing -> pure ()
+            Just value ->
+              void $
+                upsert  -- update or insert
+                  (Stake username' value)  -- insert
+                  [StakeValue =. value]  -- update
           map entityVal <$> selectList [] []
       let stakeTable =
             case stakes of
