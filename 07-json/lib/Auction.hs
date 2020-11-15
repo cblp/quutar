@@ -69,11 +69,15 @@ handleUpdate telegram bot Update{update_id, message} =
               (Stake username' value)  -- insert
               [StakeValue =. value]  -- update
           map entityVal <$> selectList [] []
-      void $ sendMessage chatId $
-        Text.unlines
-          [ stakeUsername <> ": " <> tshow stakeValue
-          | Stake{stakeUsername, stakeValue} <- stakes
-          ]
+      let stakeTable =
+            case stakes of
+              [] -> "no stakes"
+              _ : _ ->
+                Text.unlines
+                  [ stakeUsername <> ": " <> tshow stakeValue
+                  | Stake{stakeUsername, stakeValue} <- stakes
+                  ]
+      void $ sendMessage chatId stakeTable
       putLog $ "Sent results to " ++ show chat ++ " " ++ show from
 
 tshow :: Show a => a -> Text
