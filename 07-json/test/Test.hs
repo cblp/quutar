@@ -33,23 +33,23 @@ prop_auction_takes_stakes =
           , makeUpdate 32 "Floyd" "300"
           ]
     toList sent
-      === [ (36, "Floyd: 100\n")
-          , (36, "Floyd: 100\nLloyd: 200\n")
-          , (36, "Floyd: 300\nLloyd: 200\n")
+      === [ "Floyd: 100\n"
+          , "Floyd: 100\nLloyd: 200\n"
+          , "Floyd: 300\nLloyd: 200\n"
           ]
 
-runTelegram :: [Update] -> IO (Seq (Integer, Text))
+runTelegram :: [Update] -> IO (Seq Text)
 runTelegram updates = do
   (telegram, sentRef) <- newTelegram updates
   withSystemTempFile "stakes-sqlite" $ \databaseFile _ ->
     auction telegram databaseFile Nothing
   readIORef sentRef
 
-newTelegram :: [Update] -> IO (Telegram, IORef (Seq (Integer, Text)))
+newTelegram :: [Update] -> IO (Telegram, IORef (Seq Text))
 newTelegram updates =
   do
     sentRef <- newIORef mempty
-    let sendMessage chatId txt = modifyIORef sentRef (|> (chatId, txt))
+    let sendMessage _ txt = modifyIORef sentRef (|> txt)
     pure (Telegram{getUpdates, sendMessage, putLog}, sentRef)
   where
     getUpdates _ = pure updates
