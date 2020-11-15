@@ -5,9 +5,12 @@ packages:
   - 04-testing
   - 05-web
   - 06-parsing
+  - 07-json
 
-# extra-deps:
-#   - regex-posix-clib-2.7
-# flags:
-#   regex-posix:
-#     _regex-posix-clib: true
+extra-deps:
+  # for Windows
+    - regex-posix-clib-2.7
+
+flags:
+  regex-posix:
+    _regex-posix-clib: true  # for windows
