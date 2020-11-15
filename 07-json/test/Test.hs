@@ -1,5 +1,6 @@
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 import           Prelude             hiding (id)
 
@@ -10,20 +11,18 @@ import           Data.Text           (Text)
 import           Hedgehog            (Property, evalIO, property, withTests,
                                       (===))
 import           System.IO.Temp      (withSystemTempFile)
-import           Test.Tasty          (defaultMain, testGroup)
 import           Test.Tasty.Hedgehog (testProperty)
+import           Test.Tasty.TH       (defaultMainGenerator)
 
 import           Auction             (auction)
 import           Telegram            (Chat (..), Message (..), Telegram (..),
                                       Update (..), User (..))
 
 main :: IO ()
-main =
-  defaultMain $
-  testGroup "" [testProperty "auction takes stakes" propAuctionTakesStakes]
+main = $(defaultMainGenerator)
 
-propAuctionTakesStakes :: Property
-propAuctionTakesStakes =
+prop_auction_takes_stakes :: Property
+prop_auction_takes_stakes =
   withTests 1 $
   property $ do
     sent <-
