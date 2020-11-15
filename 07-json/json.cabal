@@ -9,26 +9,34 @@ common language
   build-depends: base, text
   default-language: Haskell2010
 
-library telegram
-  import: language
-  build-depends: aeson, lens, wreq
-  exposed-modules: Telegram
-  hs-source-dirs: telegram
-
-library database
+library auction
   import: language
   build-depends:
-    monad-logger, persistent-sqlite, persistent-template, resourcet,
+    aeson,
+    lens,
+    monad-logger,
+    persistent, persistent-sqlite, persistent-template,
+    resourcet,
+    time,
     transformers,
-  exposed-modules: Database
-  hs-source-dirs: database
+    wreq,
+  exposed-modules: Auction Telegram
+  other-modules: Database
+  hs-source-dirs: lib
 
 executable bot
   import: language
-  build-depends:
-    -- global
-    persistent, time,
-    -- package
-    database, telegram,
+  build-depends: auction
   hs-source-dirs: bot
   main-is: Main.hs
+
+test-suite test
+  import: language
+  build-depends:
+    -- global
+    containers, tasty, tasty-hunit, temporary,
+    -- package
+    auction,
+  hs-source-dirs: test
+  main-is: Test.hs
+  type: exitcode-stdio-1.0
