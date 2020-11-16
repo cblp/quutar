@@ -1,23 +1,27 @@
-cabal-version: >= 1.10
+cabal-version: 2.2
 
 name: property-testing
 version: 2020
 
 build-type: Simple
 
-library
+common language
   build-depends: base
   default-language: Haskell2010
+
+library
+  import: language
+  build-depends: QuickCheck
   exposed-modules: Expr Square
   hs-source-dirs: lib
 
 test-suite basic
+  import: language
   build-depends:
     -- global
-    base, tasty, tasty-quickcheck,
+    tasty, tasty-quickcheck,
     -- package
-    property-testing
-  default-language: Haskell2010
+    property-testing,
   hs-source-dirs: test
   main-is: Test.hs
   type: exitcode-stdio-1.0

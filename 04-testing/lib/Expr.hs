@@ -2,7 +2,9 @@
 
 module Expr where
 
-import           GHC.Generics (Generic)
+import           GHC.Generics    (Generic)
+import           Test.QuickCheck (Arbitrary, arbitrary, genericShrink, getSize,
+                                  oneof, scale, shrink)
 
 {-
   sin x + 2 x ^ 4
@@ -22,6 +24,28 @@ data Expr
   | Cos Expr
   | Pow Expr Integer
   deriving (Generic, Read, Show)
+
+instance Arbitrary Expr where
+  arbitrary = do
+    size <- getSize
+    oneof $ simple ++ if size >= 1 then complex else []
+    where
+      halve = scale (`div` 2)
+      simple =
+        [ pure Var
+        , Number <$> oneof [arbitrary, fromInteger <$> arbitrary]
+        ]
+      complex =
+        [ Sin <$> arbitrary
+        , Cos <$> arbitrary
+        , Pow <$> halve arbitrary <*> halve arbitrary
+        , Mul <$> halve arbitrary <*> halve arbitrary
+        , Div <$> halve arbitrary <*> halve arbitrary
+        , Add <$> halve arbitrary <*> halve arbitrary
+        , Sub <$> halve arbitrary <*> halve arbitrary
+        ]
+
+  shrink = genericShrink
 
 instance Eq Expr where
   Number x  == Number y

@@ -1,11 +1,8 @@
-{-# OPTIONS -Wno-orphans #-}
-
 import           Test.Tasty            (defaultMain)
-import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, conjoin,
-                                        counterexample, getSize, oneof, scale,
-                                        testProperty, (==>))
+import           Test.Tasty.QuickCheck (conjoin, counterexample, testProperty,
+                                        (==>))
 
-import           Expr                  (Expr (..))
+-- import           Expr                  ()
 import           Square                (solveSquareEquation)
 
 main :: IO ()
@@ -27,28 +24,3 @@ main =
 
 accuracy :: Double
 accuracy = 1e-12
-
-instance Arbitrary Expr where
-  arbitrary = do
-    size <- getSize
-    let halve = scale (`div` 2)
-    oneof
-      $   [ pure Var
-          -- , Number <$> arbitrary
-          , Number <$> oneof [arbitrary, fromInteger <$> arbitrary]
-          , Sin <$> arbitrary
-          , Cos <$> arbitrary
-          , Pow <$> halve arbitrary <*> halve arbitrary
-          -- , do
-          --     a <- halve arbitrary
-          --     n <- halve arbitrary
-          --     pure $ Pow a n
-          ]
-      ++  if size >= 1 then
-            [ Mul <$> halve arbitrary <*> halve arbitrary
-            , Div <$> halve arbitrary <*> halve arbitrary
-            , Add <$> halve arbitrary <*> halve arbitrary
-            , Sub <$> halve arbitrary <*> halve arbitrary
-            ]
-          else
-            []
