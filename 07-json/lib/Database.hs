@@ -22,14 +22,14 @@ import           Database.Persist.TH        (mkMigrate, mkPersist,
 import           UnliftIO.Resource          (ResourceT)
 
 $(share
-  [mkPersist sqlSettings, mkMigrate "migrateAll"]
-  [persistLowerCase|
-    Stake
-      username  Text
-      value     Int
-      UniqueUsername username
-      deriving Show
-  |])
+    [mkPersist sqlSettings, mkMigrate "migrateAll"]
+    [persistLowerCase|
+      Stake
+        username  Text
+        value     Int
+        UniqueUsername username
+        deriving Show
+    |])
 
 type DatabaseAction = ReaderT SqlBackend (NoLoggingT (ResourceT IO))
 
