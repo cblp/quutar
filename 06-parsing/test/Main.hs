@@ -8,7 +8,9 @@ import           Test.Tasty.QuickCheck (Arbitrary, arbitrary, getSize, oneof,
                                         scale)
 import           Text.Megaparsec       (errorBundlePretty, parse)
 
-import           Expr                  (Expr (..))
+import           Expr                  (Expr (..),
+                                        -- showExpr,
+                                        )
 import           Expr.Parse            (expr)
 
 main :: IO ()
@@ -21,7 +23,7 @@ main =
       , caseParseExpr "var"              "x"       Var
       -- , testProperty "show <-> parse" $
       --   \e ->
-      --     case parse expr "show" (show e) of
+      --     case parse expr "show" (showExpr e) of
       --       Left errorBundle ->
       --         counterexample (errorBundlePretty errorBundle) False
       --       Right e' -> e' === e

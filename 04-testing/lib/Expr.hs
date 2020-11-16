@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Expr where
 
-import           GHC.Generics      (Generic)
+import           GHC.Generics (Generic)
 
 {-
   sin x + 2 x ^ 4
@@ -21,7 +21,7 @@ data Expr
   | Sin Expr
   | Cos Expr
   | Pow Expr Integer
-  deriving (Generic, Read)
+  deriving (Generic, Read, Show)
 
 instance Eq Expr where
   Number x  == Number y
@@ -37,21 +37,39 @@ instance Eq Expr where
   Cos x     == Cos y     = x == y
   _         == _         = False
 
-instance Show Expr where
-  show expr =
-    case expr of
-      Number n  -> show n
-      Var       -> "x"
-      Add e1 e2 -> "(" ++ show e1 ++ " + " ++ show e2 ++ ")"
-      Mul e1 e2 -> "(" ++ show e1 ++ " * " ++ show e2 ++ ")"
-      Sub e1 e2 -> "(" ++ show e1 ++ " - " ++ show e2 ++ ")"
-      Div e1 e2 -> "(" ++ show e1 ++ " / " ++ show e2 ++ ")"
-      Sin e     -> "(sin " ++ show e ++ ")"
-      Cos e     -> "(cos " ++ show e ++ ")"
-      Pow e n   -> "(" ++ show e ++ " ^ " ++ show n ++ ")"
+showExpr :: Expr -> String
+showExpr expr =
+  case expr of
+    Number n -> show n
+    Var      -> "x"
+    Sin e    -> "sin " ++ pShow 4 e
+    Cos e    -> "cos " ++ pShow 4 e
+    Pow e n  -> pShow 3 e ++ " ^ " ++ show n
+    Mul a b  -> pShow 1 a ++ " * " ++ pShow 2 b
+    Div a b  -> pShow 1 a ++ " / " ++ pShow 2 b
+    Add a b  -> pShow 0 a ++ " + " ++ pShow 1 b
+    Sub a b  -> pShow 0 a ++ " - " ++ pShow 1 b
+  where
 
-showFullExpr :: Expr -> String
-showFullExpr f = "f x = " ++ show f
+    pShow n e
+      | prio e <= n = "(" ++ showExpr e ++ ")"
+      | otherwise   = showExpr e
+
+    prio :: Expr -> Int
+    prio e =
+      case e of
+        Number{} -> 5
+        Var      -> 5
+        Sin{}    -> 4
+        Cos{}    -> 4
+        Pow{}    -> 3
+        Mul{}    -> 2
+        Div{}    -> 2
+        Add{}    -> 1
+        Sub{}    -> 1
+
+showFunction :: Expr -> String
+showFunction f = "f x = " ++ showExpr f
 
 simplify :: Expr -> Expr
 simplify expr =
