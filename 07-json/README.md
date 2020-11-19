@@ -20,7 +20,7 @@
 
     .test/stack-test 07-json --file-watch
 
-Бота запускать необязательно, но если хочется, то
+Бота запускать необязательно, но строго желательно:
 
     while stack run bot; do echo; done
 
