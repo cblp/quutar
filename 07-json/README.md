@@ -12,7 +12,7 @@
 
     Если фамилии нет, не ставить лишний пробел.
 
-2.  (5 баллов) Принимать ставку из поля `value` объекта [`Dice`](https://core.telegram.org/bots/api#dice).
+2.  (5 баллов) Принимать ставку из объекта [`Dice`](https://core.telegram.org/bots/api#dice).
 
 ## Как проверять
 
