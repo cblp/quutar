@@ -23,4 +23,4 @@ main =
                 ]
 
 accuracy :: Double
-accuracy = 1e-12
+accuracy = 1e-9
