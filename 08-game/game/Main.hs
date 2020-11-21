@@ -1,7 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 import           Control.Exception (throw)
-import           Data.List (partition)
 import           Graphics.Gloss (Display (InWindow), Picture, Point, black,
                                  circleSolid, color, play, rectangleSolid,
                                  rotate, text, thickCircle, translate, white)
@@ -113,14 +112,17 @@ onTick dt world@World{birdY, gapsAhead}
 
 passGaps :: World -> World
 passGaps world@World{gapsBehind, gapsAhead, score} =
-  world
-    { gapsBehind = gapsBehind ++ gapsPassed
-    , gapsAhead = gapsStillAhead
-    , score = score + length gapsPassed
-    }
-  where
-    (gapsPassed, gapsStillAhead) = partition isGapPassed gapsAhead
-    isGapPassed Gap{x} = x < birdX
+  case gapsAhead of
+    gap@Gap{x} : gapsStillAhead | x < birdX ->
+      world
+        { gapsBehind = filter isGapVisible $ gapsBehind ++ [gap]
+        , gapsAhead = gapsStillAhead
+        , score = score + 1
+        }
+    _ -> world
+
+isGapVisible :: Gap -> Bool
+isGapVisible Gap{x} = x > - fromIntegral windowWidth / 2
 
 moveWorld :: Float -> World -> World
 moveWorld dt world@World{birdY, birdY', gapsBehind, gapsAhead} =
