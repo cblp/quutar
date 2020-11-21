@@ -12,5 +12,6 @@ common language
 executable game
   import: language
   build-depends: gloss
+  ghc-options: -threaded
   hs-source-dirs: game
   main-is: Main.hs

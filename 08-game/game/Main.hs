@@ -1,6 +1,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 import           Control.Exception (throw)
+import           Data.List (partition)
 import           Graphics.Gloss (Display (InWindow), Picture, Point, black,
                                  circleSolid, color, play, rectangleSolid,
                                  rotate, text, thickCircle, translate, white)
@@ -36,10 +37,11 @@ h :: Float
 h = fromIntegral windowHeight
 
 data World = World
-  { birdY  :: Float
-  , birdY' :: Float
-  , gaps   :: [Gap]
-  , score  :: Int
+  { birdY      :: Float
+  , birdY'     :: Float
+  , gapsBehind :: [Gap]
+  , gapsAhead  :: [Gap]
+  , score      :: Int
   }
 
 data Gap = Gap
@@ -50,8 +52,9 @@ initialWorld :: World
 initialWorld =
   World
     { birdY = 0
-    , birdY' = 0
-    , gaps =
+    , birdY' = 100
+    , gapsBehind = []
+    , gapsAhead =
         [ Gap{x = 200, bottom = -100, top = 100}
         , Gap{x = 500, bottom =    0, top = 200}
         ]
@@ -59,9 +62,10 @@ initialWorld =
     }
 
 render :: World -> Picture
-render World{birdY, birdY', gaps, score} =
+render World{birdY, birdY', gapsBehind, gapsAhead, score} =
   color white $ bird <> foldMap renderGap gaps <> renderScore score
   where
+    gaps = gapsBehind ++ gapsAhead
     eye  = translate 20 20 (circleSolid 10)
     skin = thickCircle birdRadius 10
     beak = translate birdRadius 0 (rectangleSolid birdRadius 10)
@@ -87,32 +91,53 @@ onEvent :: Event -> World -> World
 onEvent event world@World{birdY'} =
   case event of
     EventKey (SpecialKey KeyEsc  ) Down _ _ -> throw ExitSuccess
-    EventKey (SpecialKey KeySpace) Down _ _ -> world{birdY' = birdY' + 500}
+    EventKey (SpecialKey KeySpace) Down _ _ -> world{birdY' = birdY' + 200}
     _                                       -> world
 
 onTick :: Float -> World -> World
-onTick dt world@World{birdY, birdY', gaps}
+onTick dt world@World{birdY, gapsAhead}
   | collision = initialWorld
-  | otherwise =
-      world
-        { birdY = birdY + birdY' * dt
-        , birdY' = birdY' + gravity * dt
-        , gaps = [gap{x = x - dt * xSpeed} | gap@Gap{x} <- gaps]
-        }
+  | otherwise = moveWorld dt $ passGaps world
   where
     gameFloor = - h / 2
     gameCeiling = h / 2
-    gravity = -200
-    xSpeed = 100
 
     collision =
-      birdY < gameFloor || birdY > gameCeiling || any collisionWithGap gaps
+      birdY < gameFloor || birdY > gameCeiling || any collisionWithGap gapsAhead
 
     collisionWithGap Gap{x, bottom, top}
       | bottom < birdY, birdY < top =
           distance (birdX, birdY) (x, bottom) < birdRadius
           || distance (birdX, birdY) (x, top) < birdRadius
       | otherwise = abs (birdX - x) < birdRadius
+
+passGaps :: World -> World
+passGaps world@World{gapsBehind, gapsAhead, score} =
+  world
+    { gapsBehind = gapsBehind ++ gapsPassed
+    , gapsAhead = gapsStillAhead
+    , score = score + length gapsPassed
+    }
+  where
+    (gapsPassed, gapsStillAhead) = partition isGapPassed gapsAhead
+    isGapPassed Gap{x} = x < birdX
+
+moveWorld :: Float -> World -> World
+moveWorld dt world@World{birdY, birdY', gapsBehind, gapsAhead} =
+  world
+    { birdY  = birdY  + birdY'  * dt
+    , birdY' = birdY' + gravity * dt
+    , gapsBehind = map (moveGap dt) gapsBehind
+    , gapsAhead  = map (moveGap dt) gapsAhead
+    }
+  where
+    gravity = -100
+
+moveGap :: Float -> Gap -> Gap
+moveGap dt gap@Gap{x} =
+  gap{x = x - dt * xSpeed}
+  where
+    xSpeed = 100
 
 birdX :: Float
 birdX = 0
