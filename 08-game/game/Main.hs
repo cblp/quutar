@@ -1,9 +1,12 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 import           Control.Exception (throw)
-import           Graphics.Gloss (Display (InWindow), Picture, black,
+import           Graphics.Gloss (Display (InWindow), Picture, Point, black,
                                  circleSolid, color, play, rectangleSolid,
                                  rotate, text, thickCircle, translate, white)
+import qualified Graphics.Gloss.Data.Point.Arithmetic as Point
+import           Graphics.Gloss.Data.Vector (argV, magV)
+import           Graphics.Gloss.Geometry.Angle (radToDeg)
 import           Graphics.Gloss.Interface.Pure.Game (Event (EventKey),
                                                      Key (SpecialKey),
                                                      KeyState (Down),
@@ -49,7 +52,7 @@ initialWorld =
     { birdY = 0
     , birdY' = 0
     , gaps =
-        [ Gap{x = 100, bottom = -100, top = 100}
+        [ Gap{x = 200, bottom = -100, top = 100}
         , Gap{x = 500, bottom =    0, top = 200}
         ]
     , score = 0
@@ -62,9 +65,11 @@ render World{birdY, birdY', gaps, score} =
     eye  = translate 20 20 (circleSolid 10)
     skin = thickCircle birdRadius 10
     beak = translate birdRadius 0 (rectangleSolid birdRadius 10)
-    bird = translate 0 birdY $ rotate pitch $ skin <> eye <> beak
-    birdRadius = 50
-    pitch = - atan2 birdY' 300 / pi * 180
+    bird = translate birdX birdY $ rotate pitch $ skin <> eye <> beak
+    pitch = negate $ radToDeg $ argV (300, birdY')
+
+birdRadius :: Float
+birdRadius = 50
 
 renderGap :: Gap -> Picture
 renderGap Gap{x, bottom, top} =
@@ -87,16 +92,30 @@ onEvent event world@World{birdY'} =
 
 onTick :: Float -> World -> World
 onTick dt world@World{birdY, birdY', gaps}
-  | birdY > gameFloor, birdY < gameCeiling =
+  | collision = initialWorld
+  | otherwise =
       world
         { birdY = birdY + birdY' * dt
         , birdY' = birdY' + gravity * dt
         , gaps = [gap{x = x - dt * xSpeed} | gap@Gap{x} <- gaps]
         }
-  | otherwise =
-      initialWorld
   where
     gameFloor = - h / 2
     gameCeiling = h / 2
     gravity = -200
     xSpeed = 100
+
+    collision =
+      birdY < gameFloor || birdY > gameCeiling || any collisionWithGap gaps
+
+    collisionWithGap Gap{x, bottom, top}
+      | bottom < birdY, birdY < top =
+          distance (birdX, birdY) (x, bottom) < birdRadius
+          || distance (birdX, birdY) (x, top) < birdRadius
+      | otherwise = abs (birdX - x) < birdRadius
+
+birdX :: Float
+birdX = 0
+
+distance :: Point -> Point -> Float
+distance a b = magV $ a Point.- b
