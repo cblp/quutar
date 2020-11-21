@@ -1,11 +1,8 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-import           Graphics.Gloss                     (Display (InWindow),
-                                                     Picture, black,
-                                                     circleSolid, color, play,
-                                                     rectangleSolid,
-                                                     thickCircle, translate,
-                                                     white)
+import           Graphics.Gloss (Display (InWindow), Picture, black,
+                                 circleSolid, color, play, rectangleSolid, text,
+                                 thickCircle, translate, white)
 import           Graphics.Gloss.Interface.Pure.Game (Event (EventKey),
                                                      Key (SpecialKey),
                                                      KeyState (Down),
@@ -34,11 +31,10 @@ h :: Float
 h = fromIntegral windowHeight
 
 data World = World
-  { birdY       :: Float
-  , birdY'      :: Float
-  , gaps        :: [Gap]
-  , gamesFailed :: Integer
-  , gapsPassed  :: Integer
+  { birdY  :: Float
+  , birdY' :: Float
+  , gaps   :: [Gap]
+  , score  :: Int
   }
 
 data Gap = Gap
@@ -50,30 +46,34 @@ initialWorld =
   World
     { birdY = 0
     , birdY' = 0
-    , gaps = [Gap{x = 100, bottom = -100, top = 100}]
-    , gamesFailed = 0
-    , gapsPassed = 0
+    , gaps =
+        [ Gap{x = 100, bottom = -100, top = 100}
+        , Gap{x = 500, bottom =    0, top = 200}
+        ]
+    , score = 0
     }
 
 render :: World -> Picture
-render World{birdY, gaps} =
-  bird <> foldMap renderGap gaps
+render World{birdY, gaps, score} =
+  color white $ bird <> foldMap renderGap gaps <> renderScore score
   where
     eye  = translate 20 20 (circleSolid 10)
     skin = thickCircle birdRadius 10
     beak = translate birdRadius 0 (rectangleSolid birdRadius 10)
-    bird = translate 0 birdY $ color white (skin <> eye <> beak)
+    bird = translate 0 birdY $ skin <> eye <> beak
     birdRadius = 50
 
 renderGap :: Gap -> Picture
 renderGap Gap{x, bottom, top} =
-  color white $
-    mconcat
-      [ translate x (- h / 2 + bottom) (rectangleSolid gapWidth h)
-      , translate x (  h / 2 + top   ) (rectangleSolid gapWidth h)
-      ]
+  mconcat
+    [ translate x (- h / 2 + bottom) $ rectangleSolid gapWidth h
+    , translate x (  h / 2 + top   ) $ rectangleSolid gapWidth h
+    ]
   where
     gapWidth = 20
+
+renderScore :: Int -> Picture
+renderScore score = translate 0 (h / 4) $ text $ show score
 
 onEvent :: Event -> World -> World
 onEvent event world@World{birdY'} =
@@ -82,14 +82,17 @@ onEvent event world@World{birdY'} =
     _                                       -> world
 
 onTick :: Float -> World -> World
-onTick dt world@World{birdY, birdY', gaps, gamesFailed}
-  | birdY > - h / 2, birdY < h / 2 =
+onTick dt world@World{birdY, birdY', gaps}
+  | birdY > gameFloor, birdY < gameCeiling =
       world
         { birdY = birdY + birdY' * dt
-        , birdY' = birdY' + g * dt
-        , gaps = map (\gap@Gap{x} -> gap{x = x - dt * 100}) gaps
+        , birdY' = birdY' + gravity * dt
+        , gaps = [gap{x = x - dt * xSpeed} | gap@Gap{x} <- gaps]
         }
   | otherwise =
-      initialWorld{gamesFailed = gamesFailed + 1}
+      initialWorld
   where
-    g = -200
+    gameFloor = - h / 2
+    gameCeiling = h / 2
+    gravity = -200
+    xSpeed = 100
