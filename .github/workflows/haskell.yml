@@ -20,8 +20,8 @@ jobs:
       with:
         ghc-version: '8.8.4'
       #   cabal-version: '3.2'
-    - name: Install libgl-dev for 08-game
-      run: sudo apt-get install libgl-dev
+    - name: Install GL for 08-game
+      run: sudo apt-get install libgl-dev libglu1-mesa-dev
 
     - name: Cache
       uses: actions/cache@v1
