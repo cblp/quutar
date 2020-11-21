@@ -2,8 +2,8 @@
 
 import           Graphics.Gloss                     (Display (InWindow),
                                                      Picture, black,
-                                                     circleSolid, color, greyN,
-                                                     play, rectangleSolid,
+                                                     circleSolid, color, play,
+                                                     rectangleSolid,
                                                      thickCircle, translate,
                                                      white)
 import           Graphics.Gloss.Interface.Pure.Game (Event (EventKey),
@@ -59,11 +59,10 @@ render :: World -> Picture
 render World{birdY, gaps} =
   bird <> foldMap renderGap gaps
   where
-    body = color (greyN 0.5) (circleSolid birdRadius)
     eye  = translate 20 20 (circleSolid 10)
     skin = thickCircle birdRadius 10
     beak = translate birdRadius 0 (rectangleSolid birdRadius 10)
-    bird = translate 0 birdY $ body <> color white (skin <> eye <> beak)
+    bird = translate 0 birdY $ color white (skin <> eye <> beak)
     birdRadius = 50
 
 renderGap :: Gap -> Picture
