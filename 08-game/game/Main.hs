@@ -1,8 +1,8 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 import           Graphics.Gloss (Display (InWindow), Picture, black,
-                                 circleSolid, color, play, rectangleSolid, text,
-                                 thickCircle, translate, white)
+                                 circleSolid, color, play, rectangleSolid,
+                                 rotate, text, thickCircle, translate, white)
 import           Graphics.Gloss.Interface.Pure.Game (Event (EventKey),
                                                      Key (SpecialKey),
                                                      KeyState (Down),
@@ -54,14 +54,15 @@ initialWorld =
     }
 
 render :: World -> Picture
-render World{birdY, gaps, score} =
+render World{birdY, birdY', gaps, score} =
   color white $ bird <> foldMap renderGap gaps <> renderScore score
   where
     eye  = translate 20 20 (circleSolid 10)
     skin = thickCircle birdRadius 10
     beak = translate birdRadius 0 (rectangleSolid birdRadius 10)
-    bird = translate 0 birdY $ skin <> eye <> beak
+    bird = translate 0 birdY $ rotate pitch $ skin <> eye <> beak
     birdRadius = 50
+    pitch = - atan2 birdY' 300 / pi * 180
 
 renderGap :: Gap -> Picture
 renderGap Gap{x, bottom, top} =
