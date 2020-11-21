@@ -1,12 +1,14 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
+import           Control.Exception (throw)
 import           Graphics.Gloss (Display (InWindow), Picture, black,
                                  circleSolid, color, play, rectangleSolid,
                                  rotate, text, thickCircle, translate, white)
 import           Graphics.Gloss.Interface.Pure.Game (Event (EventKey),
                                                      Key (SpecialKey),
                                                      KeyState (Down),
-                                                     SpecialKey (KeySpace))
+                                                     SpecialKey (KeyEsc, KeySpace))
+import           System.Exit (ExitCode (ExitSuccess))
 
 main :: IO ()
 main =
@@ -79,6 +81,7 @@ renderScore score = translate 0 (h / 4) $ text $ show score
 onEvent :: Event -> World -> World
 onEvent event world@World{birdY'} =
   case event of
+    EventKey (SpecialKey KeyEsc  ) Down _ _ -> throw ExitSuccess
     EventKey (SpecialKey KeySpace) Down _ _ -> world{birdY' = birdY' + 500}
     _                                       -> world
 
