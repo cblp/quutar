@@ -6,6 +6,7 @@ packages:
   - 05-web
   - 06-parsing
   - 07-json
+  - 08-game
 
 extra-deps:
   # for Windows
