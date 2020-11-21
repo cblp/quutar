@@ -20,6 +20,8 @@ jobs:
       with:
         ghc-version: '8.8.4'
       #   cabal-version: '3.2'
+    - name: Install libgl-dev for 08-game
+      run: sudo apt-get install libgl-dev
 
     - name: Cache
       uses: actions/cache@v1
@@ -42,7 +44,7 @@ jobs:
     - {name: Run tests in task 05-web, run: .test/stack-test 05-web}
     - {name: Run tests in task 06-parsing, run: .test/stack-test 06-parsing}
     - {name: Run tests in task 07-json, run: .test/stack-test 07-json}
-    # needs libgl-dev - {name: Run tests in task 08-game, run: .test/stack-test 08-game}
+    - {name: Run tests in task 08-game, run: .test/stack-test 08-game}
 
     # - name: Install stack
     #   run:
