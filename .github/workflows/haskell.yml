@@ -35,13 +35,14 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - {name: Compile task 01, run: .test/ghc 01-intro/*.hs}
-    - {name: Compile task 02, run: .test/ghc 02-types/*.hs}
-    - {name: Run tests in task 03, run: .test/stack-test 03-testing}
-    - {name: Run tests in task 04, run: .test/stack-test 04-testing}
-    - {name: Run tests in task 05, run: .test/stack-test 05-web}
-    - {name: Run tests in task 06, run: .test/stack-test 06-parsing}
-    - {name: Run tests in task 07, run: .test/stack-test 07-json}
+    - {name: Compile task 01-intro, run: .test/ghc 01-intro/*.hs}
+    - {name: Compile task 02-types, run: .test/ghc 02-types/*.hs}
+    - {name: Run tests in task 03-testing, run: .test/stack-test 03-testing}
+    - {name: Run tests in task 04-testing, run: .test/stack-test 04-testing}
+    - {name: Run tests in task 05-web, run: .test/stack-test 05-web}
+    - {name: Run tests in task 06-parsing, run: .test/stack-test 06-parsing}
+    - {name: Run tests in task 07-json, run: .test/stack-test 07-json}
+    - {name: Run tests in task 08-game, run: .test/stack-test 08-game}
 
     # - name: Install stack
     #   run:
