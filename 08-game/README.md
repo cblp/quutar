@@ -8,6 +8,8 @@
 
     .test/stack-test 08-game --file-watch
 
+    stack run game
+
 Если на Windows возникнут проблемы с OpenGL, спросить в чате. На сайте [Gloss](http://gloss.ouroborus.net/) есть известные проблемы и известные решения.
 
 ### Ошибка `unknown GLUT entry glutInit` на Windows
