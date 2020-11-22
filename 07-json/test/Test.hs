@@ -30,9 +30,11 @@ prop_auction_takes_stakes =
   telegramProp
     [ makeUpdate "Floyd" "100"
     , makeUpdate "Lloyd" "200"
+    , makeUpdate "Alma"  "three"
     , makeUpdate "Floyd" "300"
     ]
     [ "Floyd: 100\n"
+    , "Floyd: 100\nLloyd: 200\n"
     , "Floyd: 100\nLloyd: 200\n"
     , "Floyd: 300\nLloyd: 200\n"
     ]
