@@ -15,3 +15,7 @@ extra-deps:
 flags:
   regex-posix:
     _regex-posix-clib: true  # for windows
+
+nix:
+  pure: false
+  packages: [zlib.dev, zlib.out]
