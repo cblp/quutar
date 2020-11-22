@@ -12,10 +12,15 @@
 
 Если на Windows возникнут проблемы с OpenGL, спросить в чате. На сайте [Gloss](http://gloss.ouroborus.net/) есть известные проблемы и известные решения.
 
-### Ошибка `unknown GLUT entry glutInit` на Windows
+### Ошибка `unknown GLUT entry glutInit`
 
-1. Скачать `glut32.dll` с https://developer.download.nvidia.com/cg/glut.html
-2. Если есть права администратора, положить в `\Windows\SysWOW64` (или в `\Windows\System32` на 32-битной ситеме).
+-   Linux — установить `freeglut`
+
+-   Windows
+
+    1. Скачать `glut32.dll` с https://developer.download.nvidia.com/cg/glut.html
+
+    2. Если есть права администратора, положить в `\Windows\SysWOW64` (или в `\Windows\System32` на 32-битной ситеме).
 
 ## Если что-то не получается
 
