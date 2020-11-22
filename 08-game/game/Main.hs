@@ -19,8 +19,8 @@ main =
     (InWindow "happy bird" (windowWidth, windowHeight) (0, 0))
     black
     fps
-    initialWorld
-    render
+    startWorld
+    renderWorld
     onEvent
     onTick
   where
@@ -47,8 +47,8 @@ data Gap = Gap
   { x, bottom, top :: Float
   }
 
-initialWorld :: World
-initialWorld =
+startWorld :: World
+startWorld =
   World
     { birdY = 0
     , birdY' = 100
@@ -60,8 +60,8 @@ initialWorld =
     , score = 0
     }
 
-render :: World -> Picture
-render World{birdY, birdY', gapsBehind, gapsAhead, score} =
+renderWorld :: World -> Picture
+renderWorld World{birdY, birdY', gapsBehind, gapsAhead, score} =
   color white $ bird <> foldMap renderGap gaps <> renderScore score
   where
     gaps = gapsBehind ++ gapsAhead
@@ -95,20 +95,23 @@ onEvent event world@World{birdY'} =
 
 onTick :: Float -> World -> World
 onTick dt world@World{birdY, gapsAhead}
-  | collision = initialWorld
+  | isCollision = startWorld
   | otherwise = moveWorld dt $ passGaps world
   where
-    gameFloor = - h / 2
-    gameCeiling = h / 2
+    gameFloor   = - h / 2
+    gameCeiling =   h / 2
 
-    collision =
-      birdY < gameFloor || birdY > gameCeiling || any collisionWithGap gapsAhead
+    isCollision =
+      birdY < gameFloor || birdY > gameCeiling || isCollisionWithFirstGap
 
-    collisionWithGap Gap{x, bottom, top}
-      | bottom < birdY, birdY < top =
-          distance (birdX, birdY) (x, bottom) < birdRadius
-          || distance (birdX, birdY) (x, top) < birdRadius
-      | otherwise = abs (birdX - x) < birdRadius
+    isCollisionWithFirstGap =
+      case gapsAhead of
+        [] -> False
+        Gap{x, bottom, top} : _
+          | bottom < birdY, birdY < top ->
+              distance (birdX, birdY) (x, bottom) < birdRadius
+              || distance (birdX, birdY) (x, top) < birdRadius
+          | otherwise -> abs (birdX - x) < birdRadius
 
 passGaps :: World -> World
 passGaps world@World{gapsBehind, gapsAhead, score} =

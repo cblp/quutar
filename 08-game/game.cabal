@@ -6,12 +6,12 @@ version: 2020
 build-type: Simple
 
 common language
-  build-depends: base, text
+  build-depends: base
   default-language: Haskell2010
 
 executable game
   import: language
-  build-depends: gloss
+  build-depends: gloss, random
   ghc-options: -threaded
   hs-source-dirs: game
   main-is: Main.hs
