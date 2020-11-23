@@ -16,7 +16,7 @@
 
 2.  `import Web.Scotty`
 
-    1.  [`liftAndCatchIO :: IO a -> ActionM a`](https://hackage.haskell.org/package/scotty/docs/Web-Scotty.html#v:liftAndCatchIO) — преобразование IO-действий в действия ActionM
+    1.  [`liftAndCatchIO :: IO a -> ActionM a`](https://hackage.haskell.org/package/scotty/docs/Web-Scotty.html#v:liftAndCatchIO) — преобразование IO-действий в действия ActionM (где `ActionM = ActionT Text IO`)
 
 ## Как проверять
 
