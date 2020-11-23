@@ -8,7 +8,7 @@
 
 1.  `import Data.IORef`
 
-    1.  [`IORef a`](https://hackage.haskell.org/package/base/docs/Data-IORef.html#t:IORef) — ссылка на изменяемую переменную заданного типа.
+    1.  [`IORef a`](https://hackage.haskell.org/package/base/docs/Data-IORef.html#t:IORef) — ссылка на изменяемую ячейку памяти заданного типа.
 
     2.  [`newIORef :: a -> IO (IORef a)`](https://hackage.haskell.org/package/base/docs/Data-IORef.html#v:newIORef) — IO-действие создания новой IORef.
 
