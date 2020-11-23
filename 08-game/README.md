@@ -4,6 +4,11 @@
 
 Высота зазора — 200.
 
+## Материал для самостоятельного изучения
+
+1.  [newStdGen](https://hackage.haskell.org/package/random/docs/System-Random.html#v:newStdGen)
+2.  [randomR](https://hackage.haskell.org/package/random/docs/System-Random.html#v:randomR)
+
 ## Как проверять
 
     .test/stack-test 08-game --file-watch
