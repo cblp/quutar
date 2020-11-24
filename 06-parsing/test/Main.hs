@@ -1,10 +1,12 @@
-import           Test.Tasty       (TestName, TestTree, defaultMain, testGroup)
+import           Test.Tasty (TestName, TestTree, defaultMain, testGroup)
 import           Test.Tasty.HUnit (assertFailure, testCase, (@?=))
 -- import           Test.Tasty.QuickCheck (counterexample, testProperty, (===))
-import           Text.Megaparsec  (errorBundlePretty, parse)
+import           Text.Megaparsec (ParseErrorBundle, Parsec, eof,
+                                  errorBundlePretty, parse)
+import           Text.Megaparsec.Char (space)
 
-import           Expr             (Expr (..))
-import           Expr.Parse       (expr)
+import           Expr (Expr (..))
+import           Expr.Parse (expr)
 
 main :: IO ()
 main =
@@ -14,9 +16,9 @@ main =
       , caseParseExpr "negative integer" "-4"    $ Number (-4)
       , caseParseExpr "floating"         "-4.18" $ Number (-4.18)
       , caseParseExpr "var"              "x"       Var
-      -- , testProperty "show <-> parse" $
+      -- , testProperty "showExpr <-> parse" $
       --   \e ->
-      --     case parse expr "show" (showExpr e) of
+      --     case parseWhole expr "showExpr" (showExpr e) of
       --       Left errorBundle ->
       --         counterexample (errorBundlePretty errorBundle) False
       --       Right e' -> e' === e
@@ -25,6 +27,14 @@ main =
 caseParseExpr :: TestName -> String -> Expr -> TestTree
 caseParseExpr description input expected =
   testCase description $
-    case parse expr "input" input of
+    case parseWhole expr "input" input of
       Left errorBundle -> assertFailure $ errorBundlePretty errorBundle
       Right e          -> e @?= expected
+
+parseWhole
+  :: Ord e
+  => Parsec e String a
+  -> FilePath
+  -> String
+  -> Either (ParseErrorBundle String e) a
+parseWhole p = parse $ space *> p <* eof
