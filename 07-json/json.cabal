@@ -9,7 +9,7 @@ common language
   build-depends: base, text
   default-language: Haskell2010
 
-library auction
+library
   import: language
   build-depends:
     aeson,
@@ -26,7 +26,7 @@ library auction
 
 executable bot
   import: language
-  build-depends: auction
+  build-depends: json
   hs-source-dirs: bot
   main-is: Main.hs
 
@@ -36,7 +36,7 @@ test-suite test
     -- global
     containers, filepath, hedgehog, tasty, tasty-hedgehog, tasty-th, temporary,
     -- package
-    auction,
+    json,
   hs-source-dirs: test
   main-is: Test.hs
   type: exitcode-stdio-1.0
