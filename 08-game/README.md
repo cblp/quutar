@@ -6,8 +6,9 @@
 
 ## Материал для самостоятельного изучения
 
-1.  [newStdGen](https://hackage.haskell.org/package/random/docs/System-Random.html#v:newStdGen)
-2.  [randomR](https://hackage.haskell.org/package/random/docs/System-Random.html#v:randomR)
+1.  [ГПСЧ](https://ru.wikipedia.org/wiki/Генератор_псевдослучайных_чисел)
+2.  [newStdGen](https://hackage.haskell.org/package/random/docs/System-Random.html#v:newStdGen)
+3.  [randomR](https://hackage.haskell.org/package/random/docs/System-Random.html#v:randomR)
 
 ## Как проверять
 
