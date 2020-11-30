@@ -3,7 +3,7 @@
 import           Prelude hiding (filter)
 
 import qualified Language.C.Quote as C
-import           Language.C.Quote.GCC (citems, cexp, cstms, cunit)
+import           Language.C.Quote.GCC (cexp, citems, cstms, cunit)
 import           System.Process (callProcess)
 import           Text.PrettyPrint.Mainland (pretty)
 import           Text.PrettyPrint.Mainland.Class (ppr)
