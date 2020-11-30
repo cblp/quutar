@@ -3,86 +3,108 @@
 import           Prelude hiding (filter)
 
 import qualified Language.C.Quote as C
-import           Language.C.Quote.GCC (cdecl, cexp, cunit)
+import           Language.C.Quote.GCC (cdecl, cexp, cstms, cunit)
 import           System.Process (callProcess)
 import           Text.PrettyPrint.Mainland (pretty)
 import           Text.PrettyPrint.Mainland.Class (ppr)
 
-data Program = Program Filter Mapper Reducer
+data Program = Program Filter Aggregate
 
-data Filter = Filter
-  { value :: FilterValue
-  -- TODO , filterField :: Word
-  }
-
-data FilterValue
+data Filter
   = FilterString String
   | FilterInt Int
 
-data Mapper = Mapper
-  -- { mapperField :: Word
-  -- }
-
-data Reducer = Sum
+data Aggregate = Sum | Min | Max
 
 main :: IO ()
-main =
-  compileAndWriteFile "filtersum.c" $
-    Program
-      Filter{ {- field = 1 -} value = FilterInt 33}
-      Mapper{ {- field = 2 -} }
-      Sum
+main = compile "filtersum.c" $ Program (FilterInt 33) Min
 
-compileAndWriteFile :: FilePath -> Program -> IO ()
-compileAndWriteFile file prog = do
-  writeFile file $ pretty 80 $ ppr $ compile prog
-  callProcess
-    "gcc" [file, "-Wall", "-Werror", "-Wextra", "-pedantic"]
+compile :: FilePath -> Program -> IO ()
+compile file prog = do
+  writeFile file $ pretty 80 $ ppr $ genC prog
+  callProcess "gcc" [file, "-Wall", "-Werror", "-Wextra", "-pedantic"]
 
-compile :: Program -> [C.Definition]
-compile (Program filter Mapper Sum) =
+genC :: Program -> [C.Definition]
+genC (Program filter aggregate) =
   [cunit|
     $esc:("#include <stdint.h>")
     $esc:("#include <stdio.h>")
     $esc:("#include <string.h>")
 
     int main() {
-      typename int64_t sum = 0;
-      $decl:declaration;
-      typename int64_t f2;
-      while (scanf($string:scanfSpec, $scanfRef, &f2) == 2) {
-        if ($condition)
-          sum += f2;
+      $decl:filterDeclaration;
+      $decl:aggregateDeclaration;
+      typename int64_t value;
+      while (
+        scanf($string:(filterScanfSpec ++ "%lld"), $filterScanfRef, &value) == 2
+      ) {
+        if ($filterCondition) {
+          $stms:aggregateStatements
+        }
       }
-      printf("%lld\n", sum);
+      printf("%lld\n", $aggregateResult);
       return 0;
     }
   |]
   where
-    FilterCode{declaration, scanfSpec, scanfRef, condition} =
-      compileFilter filter
+    FilterCode   {..} = compileFilter    filter
+    AggregateCode{..} = compileAggregate aggregate
 
 data FilterCode = FilterCode
-  { declaration :: C.InitGroup
-  , scanfSpec   :: String
-  , scanfRef    :: C.Exp
-  , condition   :: C.Exp
+  { filterDeclaration :: C.InitGroup
+  , filterScanfSpec   :: String
+  , filterScanfRef    :: C.Exp
+  , filterCondition   :: C.Exp
   }
 
 compileFilter :: Filter -> FilterCode
-compileFilter Filter{value} =
-  case value of
-    FilterString s ->
-      FilterCode
-        { declaration = [cdecl| char f1[16]; |]
-        , scanfSpec   = "%s%lld"
-        , scanfRef    = [cexp| f1 |]
-        , condition   = [cexp| strcmp(f1, $string:s) == 0 |]
-        }
-    FilterInt i ->
-      FilterCode
-        { declaration = [cdecl| typename int64_t f1; |]
-        , scanfSpec   = "%lld%lld"
-        , scanfRef    = [cexp| &f1 |]
-        , condition   = [cexp| f1 == $int:i |]
-        }
+compileFilter = \case
+  FilterString s ->
+    FilterCode
+      { filterDeclaration = [cdecl| char key[16]; |]
+      , filterScanfSpec   = "%s"
+      , filterScanfRef    = [cexp| key |]
+      , filterCondition   = [cexp| strcmp(key, $string:s) == 0 |]
+      }
+  FilterInt i ->
+    FilterCode
+      { filterDeclaration = [cdecl| typename int64_t key; |]
+      , filterScanfSpec   = "%lld"
+      , filterScanfRef    = [cexp| &key |]
+      , filterCondition   = [cexp| key == $int:i |]
+      }
+
+data AggregateCode = AggregateCode
+  { aggregateDeclaration :: C.InitGroup
+  , aggregateStatements  :: [C.Stm]
+  , aggregateResult      :: C.Exp
+  }
+
+compileAggregate :: Aggregate -> AggregateCode
+compileAggregate = \case
+  Sum ->
+    AggregateCode
+      { aggregateDeclaration = [cdecl| typename int64_t result = 0; |]
+      , aggregateStatements  = [cstms| result += value; |]
+      , aggregateResult      = [cexp| result |]
+      }
+  Min ->
+    AggregateCode
+      { aggregateDeclaration = [cdecl| typename int64_t result = INT64_MAX; |]
+      , aggregateStatements  =
+          [cstms|
+            if (value < result)
+              result = value;
+          |]
+      , aggregateResult      = [cexp| result |]
+      }
+  Max ->
+    AggregateCode
+      { aggregateDeclaration = [cdecl| typename int64_t result = INT64_MIN; |]
+      , aggregateStatements  =
+          [cstms|
+            if (value > result)
+              result = value;
+          |]
+      , aggregateResult      = [cexp| result |]
+      }

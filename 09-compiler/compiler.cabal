@@ -12,7 +12,7 @@ common language
 executable compiler
   import: language
   build-depends: language-c-quote, mainland-pretty, process
-  default-extensions: NamedFieldPuns QuasiQuotes
+  default-extensions: LambdaCase NamedFieldPuns QuasiQuotes RecordWildCards
   main-is: Main.hs
 
 executable filtersum
