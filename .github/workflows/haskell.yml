@@ -45,6 +45,7 @@ jobs:
     - {name: Run tests in task 06-parsing, run: .test/stack-test 06-parsing}
     - {name: Run tests in task 07-json, run: .test/stack-test 07-json}
     - {name: Run tests in task 08-game, run: .test/stack-test 08-game}
+    - {name: Run tests in task 08-compiler, run: .test/stack-test 08-compiler}
 
     # - name: Install stack
     #   run:
