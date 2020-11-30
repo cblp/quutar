@@ -1,0 +1,20 @@
+cabal-version: 2.2
+
+name: compiler
+version: 2020
+
+build-type: Simple
+
+common language
+  build-depends: base
+  default-language: Haskell2010
+
+executable compiler
+  import: language
+  build-depends: language-c-quote, mainland-pretty, process
+  default-extensions: NamedFieldPuns QuasiQuotes
+  main-is: Main.hs
+
+executable filtersum
+  import: language
+  main-is: FilterSum.hs
