@@ -8,6 +8,7 @@ packages:
   - 07-json
   - 08-game
   - 09-compiler
+  - 09-compiler-py
 
 extra-deps:
   # for Windows
