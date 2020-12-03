@@ -23,16 +23,14 @@ b_c --> c : c
 ```
 
 ```haskell
+-- 1
 writeFile "foo" (show int)
 
-==
-
+-- 2
 (writeFile "foo" . show) int
 
-==
-
+-- 3
 writeInt = writeFile "foo" . show
-
 main = writeInt int
 ```
 
@@ -84,10 +82,12 @@ map (map read . words) . lines <$> getContents
 ```haskell
 (<*>) :: m (a -> b) -> m a -> m b
 liftA2 :: (a -> b -> c) -> m a -> m b -> m c
+```
 
+<!-- ```haskell
 liftA2 f ma mb = f <$> a <*> b
 mf <*> ma = liftA2 ($) mf ma
-```
+``` -->
 
 ```plantuml
 left to right direction
@@ -136,8 +136,8 @@ sqlQuery "SELECT * FROM students" :: SqlQuery [Student]
 sqlQuery "SELECT * FROM teachers" :: SqlQuery [Teacher]
 
 -- 2
-expensesA :: SqlQuery Money
-expensesA =
+expensesParallel :: SqlQuery Money
+expensesParallel =
   liftA2
     (\students teachers ->
       foldMap scholarship students <>
@@ -146,8 +146,8 @@ expensesA =
     (sqlQuery "SELECT * FROM teachers")
 
 -- 3
-expensesM :: SqlQuery Money
-expensesM = do
+expensesSequential :: SqlQuery Money
+expensesSequential = do
   students <- sqlQuery "SELECT * FROM students"
   teachers <- sqlQuery "SELECT * FROM teachers"
   pure $
@@ -174,6 +174,94 @@ interface " " as b
 m_b --> b : "b"
 ```
 
-## Applicative IO
+```haskell
+-- 1
+expenses1 :: SqlQuery Money
+expenses1 = do
+  students <- sqlQuery "SELECT * FROM students"
+  teachers <- sqlQuery "SELECT * FROM teachers"
+  pure $
+    foldMap scholarship students <>
+    foldMap salary teachers
 
-## Monad IO
+-- 2
+expenses2 :: SqlQuery Money
+expenses2 = do
+  sqlQuery "SELECT * FROM students"
+  >>=
+  (\students ->
+      sqlQuery "SELECT * FROM teachers"
+      >>=
+      (\teachers ->
+          pure $
+            foldMap scholarship students <>
+            foldMap salary teachers))
+```
+
+## Megaparsec
+
+```haskell
+-- parser for decimal number
+float :: Megeparsec.Parser Double
+float =
+  liftA2
+    (\int frac ->
+      fromIntegral (stringToInt int) +
+      fromIntegral (stringToInt frac) / 10 ^ length frac)
+    (many digit)
+    (optional $ char '.' *> many didit)
+```
+
+## optparse-applicative
+
+```haskell
+data Options = Options
+  { verbose    :: Bool
+  , inputFile  :: FilePath
+  , outputFile :: Maybe FilePath
+  }
+
+options :: Optparse.Parser Options
+options = do
+  verbose <-
+    switch $ long "verbose" <> short 'v' <> help "Print debug information"
+  inputFile <-
+    strOption $ long "input" <> short 'i' <> metavar "FILE" <> help "Input file"
+  outputFile <-
+    optional $
+    strOption $
+      long "output" <>
+      short 'o' <>
+      metavar "FILE" <>
+      help "Output file, default is standard output"
+  pure Options{..}
+```
+
+```
+$ myprog --help
+
+Usage: myprog (-v|--verbose) (-i|--input=FILE) [-o|--output=FILE]
+
+Available options:
+  -v,--verbose      Print debug information
+  -i,--input=FILE   Input file
+  -o,--output=FILE  Output file, default is standard output
+```
+
+## Регулярные выражения
+
+`[0-9]+(\.[0-9]+)?`
+
+## regex-applicative
+
+```haskell
+-- parser for decimal number
+float :: RE Char Double
+float =
+  liftA2
+    (\int frac ->
+      fromIntegral (stringToInt int) +
+      fromIntegral (stringToInt frac) / 10 ^ length frac)
+    (many digit)
+    (optional $ char '.' *> many didit)
+```
