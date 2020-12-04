@@ -205,11 +205,13 @@ expenses2 = do
 float :: Megeparsec.Parser Double
 float =
   liftA2
-    (\int frac ->
+    stringsToFloat
+    (many digit)
+    (optional $ char '.' *> many digit)
+  where
+    stringsToFloat int frac =
       fromIntegral (stringToInt int) +
       fromIntegral (stringToInt frac) / 10 ^ length frac)
-    (many digit)
-    (optional $ char '.' *> many didit)
 ```
 
 ## optparse-applicative
@@ -252,6 +254,10 @@ Available options:
 
 `[0-9]+(\.[0-9]+)?`
 
+## regex-posix
+
+`"3.14" =~ "[0-9]+(\\.[0-9]+)?"`
+
 ## regex-applicative
 
 ```haskell
@@ -259,9 +265,11 @@ Available options:
 float :: RE Char Double
 float =
   liftA2
-    (\int frac ->
+    stringsToFloat
+    (many digit)
+    (optional $ char '.' *> many digit)
+  where
+    stringsToFloat int frac =
       fromIntegral (stringToInt int) +
       fromIntegral (stringToInt frac) / 10 ^ length frac)
-    (many digit)
-    (optional $ char '.' *> many didit)
 ```
