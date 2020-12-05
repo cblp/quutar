@@ -8,7 +8,7 @@ import           Square                (solveSquareEquation)
 main :: IO ()
 main =
   defaultMain $
-    testProperty "solveSquareEquation" $
+    testProperty "solveSquareEquation results are the equation roots" $
       \a b c -> -- ∀ a b c : Double .
         a /= 0 ==>
           let roots = solveSquareEquation a b c
