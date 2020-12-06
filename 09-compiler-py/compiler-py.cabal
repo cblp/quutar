@@ -9,7 +9,7 @@ common language
   build-depends: base, text
   default-language: Haskell2010
 
-executable compiler
+executable compiler-py
   import: language
   build-depends: neat-interpolation
   default-extensions:
