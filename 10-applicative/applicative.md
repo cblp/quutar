@@ -211,7 +211,7 @@ float =
   where
     stringsToFloat int frac =
       fromIntegral (stringToInt int) +
-      fromIntegral (stringToInt frac) / 10 ^ length frac)
+      fromIntegral (stringToInt frac) / 10 ^ length frac
 ```
 
 ## optparse-applicative
@@ -271,5 +271,9 @@ float =
   where
     stringsToFloat int frac =
       fromIntegral (stringToInt int) +
-      fromIntegral (stringToInt frac) / 10 ^ length frac)
+      fromIntegral (stringToInt frac) / 10 ^ length frac
 ```
+
+# Валидация
+
+https://github.com/system-f/validation/blob/master/examples/src/Email.hs
