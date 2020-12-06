@@ -277,3 +277,23 @@ float =
 # Валидация
 
 https://github.com/system-f/validation/blob/master/examples/src/Email.hs
+
+# Haxl (Facebook Sigma)
+
+```java
+-- 1
+NumCommonFriends(x, y) = Length(Intersect(FriendsOf(x), FriendsOf(y)))
+```
+
+```haskell
+-- 2
+numCommonFriends x y =
+  length <$> (intersect <$> friendsOf x <*> friendsOf y)
+
+-- 3
+friendsOfFriends :: Id -> Haxl [Id]
+friendsOfFriends id = do
+  friends <- friendsOf id
+  fofs <- mapM friendsOf friends
+  return (concat fofs)
+```
