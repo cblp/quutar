@@ -77,6 +77,39 @@ map (map read . words) . lines <$> getContents
   :: IO [[Integer]]
 ```
 
+```plantuml
+cloud ":: IO [String]" {
+  cloud "getContents :: IO String" as getContents
+
+  rectangle "lines :: String → [String]" as lines
+
+  rectangle "map words :: [String] → [ [String] ]" as map_words
+
+  getContents --> lines
+  lines --> map_words
+}
+
+interface ":: [ [String] ]" as r
+
+map_words --> r
+```
+
+```haskell
+-- ассоциативность
+(a <> b) <> c == a <> (b <> c)
+
+-- ассоциативность
+(a . b) . c == a . (b . c)
+
+-- "ассоциативность"
+(f . g) <$> ma == f <$> (g <$> ma)
+
+-- fmap (f . g) ma == fmap f (fmap g ma)
+-- (fmap (f . g)) ma == (fmap f . fmap g) ma
+
+fmap (f . g) == fmap f . fmap g
+```
+
 # Applicative
 
 ```haskell
@@ -111,21 +144,21 @@ a_b_c --> c : "c"
 readLn :: IO Integer
 
 -- 2
-liftA2 (+) readLn readLn :: IO Integer
+liftA2 (-) readLn readLn :: IO Integer
 ```
 
 ## Applicative Concurrently
 
 ```haskell
--- 1
+-- 4
 Concurrently :: IO a -> Concurrently a
 
--- 2
-readLnC :: IO Integer
+-- 5
+readLnC :: Concurrently Integer
 readLnC = Concurrently readLn
 
--- 3
-liftA2 (+) readLnC readLnC :: IO Integer
+-- 6
+liftA2 (-) readLnC readLnC :: Concurrently Integer
 ```
 
 ## Applicative SQL
@@ -186,7 +219,7 @@ expenses1 = do
 
 -- 2
 expenses2 :: SqlQuery Money
-expenses2 = do
+expenses2 =
   sqlQuery "SELECT * FROM students"
   >>=
   (\students ->
@@ -206,12 +239,17 @@ float :: Megeparsec.Parser Double
 float =
   liftA2
     stringsToFloat
-    (many digit)
-    (optional $ char '.' *> many digit)
+    (some digit)
+    (optional $ char '.' *> some digit)
   where
-    stringsToFloat int frac =
+    stringsToFloat int mfrac =
       fromIntegral (stringToInt int) +
-      fromIntegral (stringToInt frac) / 10 ^ length frac
+      maybe
+        0
+        (\frac ->
+            fromIntegral (stringToInt frac)
+            / 10 ^ length frac)
+        mfrac
 ```
 
 ## optparse-applicative
@@ -242,7 +280,7 @@ options = do
 ```
 $ myprog --help
 
-Usage: myprog (-v|--verbose) (-i|--input=FILE) [-o|--output=FILE]
+Usage: myprog [-v|--verbose] (-i|--input=FILE) [-o|--output=FILE]
 
 Available options:
   -v,--verbose      Print debug information
@@ -266,12 +304,17 @@ float :: RE Char Double
 float =
   liftA2
     stringsToFloat
-    (many digit)
-    (optional $ char '.' *> many digit)
+    (some digit)
+    (optional $ char '.' *> some digit)
   where
-    stringsToFloat int frac =
+    stringsToFloat int mfrac =
       fromIntegral (stringToInt int) +
-      fromIntegral (stringToInt frac) / 10 ^ length frac
+      maybe
+        0
+        (\frac ->
+            fromIntegral (stringToInt frac)
+            / 10 ^ length frac)
+        mfrac
 ```
 
 # Валидация
@@ -279,6 +322,8 @@ float =
 https://github.com/system-f/validation/blob/master/examples/src/Email.hs
 
 # Haxl (Facebook Sigma)
+
+https://github.com/facebook/Haxl/tree/master/example/sql
 
 ```java
 -- 1
